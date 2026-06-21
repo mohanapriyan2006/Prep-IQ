@@ -64,7 +64,7 @@ import {
 } from './localStorageDB';
 
 import { evaluateCode } from '../utils/codeEvaluator';
-import { runCodeWithPiston } from './pistonRunner';
+import { runCode } from './codeRunner';
 import { generateCodeReview, generateEditorial, generateAIAnalysis } from '../utils/mockAI';
 
 export const TOKEN_KEY = 'prepiq_auth_token';
@@ -160,7 +160,7 @@ export async function fetchProblem(problemId: number): Promise<CodingProblem> {
 }
 
 export async function executeCode(payload: ExecutePayload): Promise<ExecuteResult> {
-  return runCodeWithPiston(payload.language, payload.code, payload.input);
+  return runCode(payload.language, payload.code, payload.input);
 }
 
 export async function submitCode(payload: {

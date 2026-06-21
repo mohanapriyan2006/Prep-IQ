@@ -1,4 +1,4 @@
-import { runCodeWithPiston } from '../services/pistonRunner';
+import { runCode } from '../services/codeRunner';
 
 export interface EvaluationResult {
   status: string;
@@ -43,7 +43,7 @@ export async function evaluateCode(
   let combinedStderr = '';
 
   for (const tc of allTestcases) {
-    const result = await runCodeWithPiston(language, code, tc.input);
+    const result = await runCode(language, code, tc.input);
     const actual = normalizeOutput(result.output);
     const expected = normalizeOutput(tc.expected_output);
     const runtimeNum = parseFloat(result.runtime.replace('ms', '')) || 0;
