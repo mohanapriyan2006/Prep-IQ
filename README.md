@@ -1,4 +1,4 @@
-# PrepIQ
+# [PrepIQ](https://prepiq-dev.netlify.app/)
 
 > Your AI-Powered Placement Intelligence System
 
