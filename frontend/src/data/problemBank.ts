@@ -1,0 +1,580 @@
+import type { CodingProblem } from '../types/coding';
+
+export interface ProblemWithTestcases extends CodingProblem {
+  visible_testcases: Array<{ input: string; expected_output: string }>;
+  hidden_testcases: Array<{ input: string; expected_output: string }>;
+}
+
+function makeProblem(
+  id: number,
+  title: string,
+  difficulty: 'Easy' | 'Medium' | 'Hard',
+  topic: string,
+  topic_tags: string[],
+  description: string,
+  input_format: string,
+  output_format: string,
+  constraints: string,
+  examples: Array<{ input: string; output: string; explanation?: string }>,
+  company_tags: string[],
+  hints: string[],
+  visible_testcases: Array<{ input: string; expected_output: string }>,
+  hidden_testcases: Array<{ input: string; expected_output: string }>,
+  is_premium = false,
+): ProblemWithTestcases {
+  return {
+    id,
+    title,
+    difficulty,
+    topic,
+    tutorial_link: null,
+    topic_tags,
+    is_premium,
+    description,
+    input_format,
+    output_format,
+    constraints,
+    examples,
+    company_tags,
+    hints,
+    solved: false,
+    is_bookmarked: false,
+    visible_testcases,
+    hidden_testcases,
+  };
+}
+
+export const problemBank: ProblemWithTestcases[] = [
+  makeProblem(
+    1, 'Two Sum', 'Easy', 'Array', ['Array', 'Hash Table'],
+    'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution.',
+    'n\\nnums (space-separated)\\ntarget',
+    'Two space-separated integers (indices)',
+    '2 <= n <= 10^4',
+    [
+      { input: '4\\n2 7 11 15\\n9', output: '0 1', explanation: 'Because nums[0] + nums[1] == 9.' },
+      { input: '3\\n3 2 4\\n6', output: '1 2' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Use a hash map to store the complement of each number.', 'A brute force way would be to search for all possible pairs.'],
+    [
+      { input: '4\\n2 7 11 15\\n9', expected_output: '0 1' },
+      { input: '3\\n3 2 4\\n6', expected_output: '1 2' },
+    ],
+    [
+      { input: '2\\n3 3\\n6', expected_output: '0 1' },
+      { input: '5\\n1 2 3 4 5\\n8', expected_output: '2 4' },
+    ],
+  ),
+  makeProblem(
+    2, 'Reverse Linked List', 'Easy', 'Linked List', ['Linked List', 'Recursion'],
+    'Given the head of a singly linked list, reverse the list. Input is space-separated values; output is reversed list.',
+    'n\\nvalues (space-separated)',
+    'Space-separated reversed values',
+    '0 <= n <= 5000',
+    [
+      { input: '5\\n1 2 3 4 5', output: '5 4 3 2 1' },
+      { input: '2\\n1 2', output: '2 1' },
+    ],
+    ['Amazon', 'Google', 'Microsoft'],
+    ['Iterate and change the next pointer.', 'Use three pointers: prev, curr, next.'],
+    [
+      { input: '5\\n1 2 3 4 5', expected_output: '5 4 3 2 1' },
+      { input: '2\\n1 2', expected_output: '2 1' },
+    ],
+    [
+      { input: '0\\n', expected_output: '' },
+      { input: '1\\n42', expected_output: '42' },
+    ],
+  ),
+  makeProblem(
+    3, 'Valid Parentheses', 'Easy', 'Stack', ['Stack', 'String'],
+    'Given a string containing just characters (), {}, [], determine if the input string is valid.',
+    'string s',
+    '"true" or "false"',
+    '1 <= s.length <= 10^4',
+    [
+      { input: '()', output: 'true' },
+      { input: '(]', output: 'false' },
+      { input: '()[]{}', output: 'true' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Use a stack to track opening brackets.', 'Match closing with top of stack.'],
+    [
+      { input: '()', expected_output: 'true' },
+      { input: '(]', expected_output: 'false' },
+    ],
+    [
+      { input: '()[]{}', expected_output: 'true' },
+      { input: '([)]', expected_output: 'false' },
+      { input: '{[]}', expected_output: 'true' },
+    ],
+  ),
+  makeProblem(
+    4, 'Best Time to Buy and Sell Stock', 'Easy', 'Array', ['Array', 'Dynamic Programming'],
+    'You are given prices where prices[i] is the price on day i. Maximize profit by buying and selling once. Return max profit or 0.',
+    'n\\nprices (space-separated)',
+    'Single integer - max profit',
+    '1 <= n <= 10^5',
+    [
+      { input: '6\\n7 1 5 3 6 4', output: '5' },
+      { input: '5\\n7 6 4 3 1', output: '0' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft', 'Adobe'],
+    ['Track minimum price so far.', 'At each price, compute profit and update max.'],
+    [
+      { input: '6\\n7 1 5 3 6 4', expected_output: '5' },
+      { input: '5\\n7 6 4 3 1', expected_output: '0' },
+    ],
+    [
+      { input: '1\\n5', expected_output: '0' },
+      { input: '3\\n2 4 1', expected_output: '2' },
+    ],
+  ),
+  makeProblem(
+    5, 'Binary Search', 'Easy', 'Binary Search', ['Binary Search', 'Array'],
+    'Given a sorted array of integers and a target, return the index of target or -1. O(log n) required.',
+    'n\\nnums (space-sorted)\\ntarget',
+    'Single integer - index or -1',
+    '1 <= n <= 10^4',
+    [
+      { input: '6\\n-1 0 3 5 9 12\\n9', output: '4' },
+      { input: '6\\n-1 0 3 5 9 12\\n2', output: '-1' },
+    ],
+    ['Amazon', 'Google', 'Microsoft'],
+    ['Compare target with middle element.', 'Discard half based on comparison.'],
+    [
+      { input: '6\\n-1 0 3 5 9 12\\n9', expected_output: '4' },
+      { input: '6\\n-1 0 3 5 9 12\\n2', expected_output: '-1' },
+    ],
+    [
+      { input: '1\\n5\\n5', expected_output: '0' },
+      { input: '3\\n1 2 3\\n0', expected_output: '-1' },
+    ],
+  ),
+  makeProblem(
+    6, 'Maximum Subarray (Kadane)', 'Medium', 'Array', ['Array', 'Dynamic Programming'],
+    'Given an integer array, find the subarray with the largest sum and return its sum.',
+    'n\\nnums (space-separated)',
+    'Single integer - max subarray sum',
+    '1 <= n <= 10^5',
+    [
+      { input: '9\\n-2 1 -3 4 -1 2 1 -5 4', output: '6' },
+      { input: '1\\n1', output: '1' },
+      { input: '5\\n5 4 -1 7 8', output: '23' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Keep a running sum. Reset if negative.', 'Update global maximum at each step.'],
+    [
+      { input: '9\\n-2 1 -3 4 -1 2 1 -5 4', expected_output: '6' },
+      { input: '1\\n1', expected_output: '1' },
+    ],
+    [
+      { input: '5\\n5 4 -1 7 8', expected_output: '23' },
+      { input: '3\\n-2 -3 -1', expected_output: '-1' },
+    ],
+  ),
+  makeProblem(
+    7, 'Climbing Stairs', 'Easy', 'Dynamic Programming', ['Dynamic Programming', 'Math'],
+    'You are climbing a staircase. It takes n steps to reach the top. Each time you can climb 1 or 2 steps. Return distinct ways.',
+    'Single integer n',
+    'Single integer - number of ways',
+    '1 <= n <= 45',
+    [
+      { input: '2', output: '2' },
+      { input: '3', output: '3' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Think of this as Fibonacci.', 'Ways(n) = Ways(n-1) + Ways(n-2).'],
+    [
+      { input: '2', expected_output: '2' },
+      { input: '3', expected_output: '3' },
+    ],
+    [
+      { input: '1', expected_output: '1' },
+      { input: '4', expected_output: '5' },
+      { input: '5', expected_output: '8' },
+    ],
+  ),
+  makeProblem(
+    8, 'Longest Substring Without Repeating Characters', 'Medium', 'String', ['String', 'Sliding Window'],
+    'Given a string s, find the length of the longest substring without repeating characters.',
+    'string s',
+    'Single integer - length',
+    '0 <= s.length <= 5*10^4',
+    [
+      { input: 'abcabcbb', output: '3' },
+      { input: 'bbbbb', output: '1' },
+      { input: 'pwwkew', output: '3' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft', 'Adobe'],
+    ['Use sliding window.', 'Track last seen index of each character.'],
+    [
+      { input: 'abcabcbb', expected_output: '3' },
+      { input: 'bbbbb', expected_output: '1' },
+    ],
+    [
+      { input: 'pwwkew', expected_output: '3' },
+      { input: '', expected_output: '0' },
+      { input: 'abcdef', expected_output: '6' },
+    ],
+  ),
+  makeProblem(
+    9, '3Sum', 'Medium', 'Array', ['Array', 'Two Pointers', 'Sorting'],
+    'Given an integer array nums, return the count of unique triplets [i,j,k] such that nums[i]+nums[j]+nums[k]==0.',
+    'n\\nnums (space-separated)',
+    'Single integer - count of unique triplets',
+    '3 <= n <= 3000',
+    [
+      { input: '6\\n-1 0 1 2 -1 -4', output: '2' },
+      { input: '3\\n0 1 1', output: '0' },
+      { input: '3\\n0 0 0', output: '1' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Sort the array first.', 'Skip duplicates to avoid duplicate triplets.'],
+    [
+      { input: '6\\n-1 0 1 2 -1 -4', expected_output: '2' },
+      { input: '3\\n0 1 1', expected_output: '0' },
+    ],
+    [
+      { input: '3\\n0 0 0', expected_output: '1' },
+      { input: '4\\n-2 0 0 2', expected_output: '1' },
+    ],
+  ),
+  makeProblem(
+    10, 'Valid Anagram', 'Easy', 'String', ['String', 'Hash Table'],
+    'Given two strings s and t, return true if t is an anagram of s, else false.',
+    's t (space-separated)',
+    '"true" or "false"',
+    '1 <= s.length <= 5*10^4',
+    [
+      { input: 'anagram nagaram', output: 'true' },
+      { input: 'rat car', output: 'false' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Count frequency of characters.', 'Compare frequency maps.'],
+    [
+      { input: 'anagram nagaram', expected_output: 'true' },
+      { input: 'rat car', expected_output: 'false' },
+    ],
+    [
+      { input: 'a a', expected_output: 'true' },
+      { input: 'ab ba', expected_output: 'true' },
+      { input: 'abc abcd', expected_output: 'false' },
+    ],
+  ),
+  makeProblem(
+    11, 'Product of Array Except Self', 'Medium', 'Array', ['Array', 'Prefix Sum'],
+    'Given nums, return answer where answer[i] = product of all nums except nums[i]. O(n) time, no division.',
+    'n\\nnums (space-separated)',
+    'Space-separated product array',
+    '2 <= n <= 10^5',
+    [
+      { input: '4\\n1 2 3 4', output: '24 12 8 6' },
+      { input: '2\\n-1 1', output: '1 -1' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Use prefix and suffix products.', 'For each position, answer = prefix[i] * suffix[i].'],
+    [
+      { input: '4\\n1 2 3 4', expected_output: '24 12 8 6' },
+      { input: '2\\n-1 1', expected_output: '1 -1' },
+    ],
+    [
+      { input: '3\\n2 3 4', expected_output: '12 8 6' },
+      { input: '3\\n1 0 2', expected_output: '0 2 0' },
+    ],
+  ),
+  makeProblem(
+    12, 'Number of Islands', 'Medium', 'Graph', ['Graph', 'BFS', 'DFS'],
+    'Given an m x n grid of 1s (land) and 0s (water), return the number of islands.',
+    'm n\\ngrid rows (space-separated per row)',
+    'Single integer - island count',
+    '1 <= m,n <= 300',
+    [
+      { input: '4 5\\n1 1 1 1 0\\n1 1 0 1 0\\n1 1 0 0 0\\n0 0 0 0 0', output: '1' },
+      { input: '4 5\\n1 1 0 0 0\\n1 1 0 0 0\\n0 0 1 0 0\\n0 0 0 1 1', output: '3' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Iterate through grid.', 'When finding 1, BFS/DFS to mark connected 1s visited.'],
+    [
+      { input: '4 5\\n1 1 1 1 0\\n1 1 0 1 0\\n1 1 0 0 0\\n0 0 0 0 0', expected_output: '1' },
+      { input: '4 5\\n1 1 0 0 0\\n1 1 0 0 0\\n0 0 1 0 0\\n0 0 0 1 1', expected_output: '3' },
+    ],
+    [
+      { input: '1 1\\n0', expected_output: '0' },
+      { input: '3 3\\n1 0 1\\n0 1 0\\n1 0 1', expected_output: '5' },
+    ],
+  ),
+  makeProblem(
+    13, 'Course Schedule', 'Medium', 'Graph', ['Graph', 'BFS', 'Topological Sort'],
+    'There are numCourses courses. prerequisites[i] = [ai, bi] means take bi before ai. Return true if all courses can be finished.',
+    'numCourses p\\np lines of ai bi',
+    '"true" or "false"',
+    '1 <= numCourses <= 2000',
+    [
+      { input: '2 1\\n1 0', output: 'true' },
+      { input: '2 2\\n1 0\\n0 1', output: 'false' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Model as directed graph and detect cycles.', 'Use Kahn\'s algorithm or DFS with state tracking.'],
+    [
+      { input: '2 1\\n1 0', expected_output: 'true' },
+      { input: '2 2\\n1 0\\n0 1', expected_output: 'false' },
+    ],
+    [
+      { input: '1 0', expected_output: 'true' },
+      { input: '3 2\\n1 0\\n2 1', expected_output: 'true' },
+    ],
+  ),
+  makeProblem(
+    14, 'Invert Binary Tree', 'Easy', 'Tree', ['Tree', 'DFS', 'BFS'],
+    'Given the root of a binary tree, invert it. Input is level-order (null for missing); output is level-order inverted (no trailing nulls).',
+    'n\\nlevel-order values (null for empty)',
+    'Space-separated inverted tree level-order',
+    '0 <= nodes <= 100',
+    [
+      { input: '7\\n4 2 7 1 3 6 9', output: '4 7 2 9 6 3 1' },
+      { input: '3\\n2 1 3', output: '2 3 1' },
+    ],
+    ['Amazon', 'Google', 'Microsoft'],
+    ['Swap left and right child at each node.', 'Use recursion or a queue for BFS.'],
+    [
+      { input: '7\\n4 2 7 1 3 6 9', expected_output: '4 7 2 9 6 3 1' },
+      { input: '3\\n2 1 3', expected_output: '2 3 1' },
+    ],
+    [
+      { input: '0\\n', expected_output: '' },
+      { input: '1\\n1', expected_output: '1' },
+    ],
+  ),
+  makeProblem(
+    15, 'Maximum Depth of Binary Tree', 'Easy', 'Tree', ['Tree', 'DFS', 'BFS'],
+    'Given the root of a binary tree, return its maximum depth. Input is level-order traversal.',
+    'n\\nlevel-order values (null for empty)',
+    'Single integer - max depth',
+    '0 <= nodes <= 10^4',
+    [
+      { input: '7\\n3 9 20 null null 15 7', output: '3' },
+      { input: '3\\n1 null 2', output: '2' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Use recursion to find max of left and right depth.', 'Add 1 for the current node.'],
+    [
+      { input: '7\\n3 9 20 null null 15 7', expected_output: '3' },
+      { input: '3\\n1 null 2', expected_output: '2' },
+    ],
+    [
+      { input: '0\\n', expected_output: '0' },
+      { input: '1\\n0', expected_output: '1' },
+    ],
+  ),
+  makeProblem(
+    16, 'House Robber', 'Medium', 'Dynamic Programming', ['Dynamic Programming', 'Array'],
+    'You are a professional robber. Given nums (money in each house), return max money without robbing adjacent houses.',
+    'n\\nnums (space-separated)',
+    'Single integer - max money',
+    '1 <= n <= 100',
+    [
+      { input: '4\\n1 2 3 1', output: '4' },
+      { input: '5\\n2 7 9 3 1', output: '12' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['At each house, choose to rob or skip it.', 'dp[i] = max(dp[i-1], dp[i-2] + nums[i]).'],
+    [
+      { input: '4\\n1 2 3 1', expected_output: '4' },
+      { input: '5\\n2 7 9 3 1', expected_output: '12' },
+    ],
+    [
+      { input: '1\\n5', expected_output: '5' },
+      { input: '2\\n1 2', expected_output: '2' },
+    ],
+  ),
+  makeProblem(
+    17, 'Jump Game', 'Medium', 'Array', ['Array', 'Greedy', 'Dynamic Programming'],
+    'You are given nums. You start at first index. Each element is your max jump length. Return true if you can reach the last index.',
+    'n\\nnums (space-separated)',
+    '"true" or "false"',
+    '1 <= n <= 10^4',
+    [
+      { input: '5\\n2 3 1 1 4', output: 'true' },
+      { input: '5\\n3 2 1 0 4', output: 'false' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Keep track of farthest reachable index.', 'If current index exceeds farthest, return false.'],
+    [
+      { input: '5\\n2 3 1 1 4', expected_output: 'true' },
+      { input: '5\\n3 2 1 0 4', expected_output: 'false' },
+    ],
+    [
+      { input: '1\\n0', expected_output: 'true' },
+      { input: '3\\n1 1 1', expected_output: 'true' },
+    ],
+  ),
+  makeProblem(
+    18, 'Merge Intervals', 'Medium', 'Array', ['Array', 'Sorting'],
+    'Given intervals [start, end], merge all overlapping intervals. Return count of merged intervals.',
+    'n\\nn lines of start end',
+    'Single integer - count of merged intervals',
+    '1 <= n <= 10^4',
+    [
+      { input: '4\\n1 3\\n2 6\\n8 10\\n15 18', output: '3' },
+      { input: '2\\n1 4\\n4 5', output: '1' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Sort intervals by start time.', 'If current overlaps with last merged, merge them.'],
+    [
+      { input: '4\\n1 3\\n2 6\\n8 10\\n15 18', expected_output: '3' },
+      { input: '2\\n1 4\\n4 5', expected_output: '1' },
+    ],
+    [
+      { input: '1\\n1 1', expected_output: '1' },
+      { input: '3\\n1 4\\n0 2\\n3 5', expected_output: '1' },
+    ],
+  ),
+  makeProblem(
+    19, 'Longest Palindromic Substring', 'Medium', 'String', ['String', 'Dynamic Programming'],
+    'Given a string s, return the longest palindromic substring. Return its length.',
+    'string s',
+    'Single integer - length of longest palindromic substring',
+    '1 <= s.length <= 1000',
+    [
+      { input: 'babad', output: '3' },
+      { input: 'cbbd', output: '2' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Expand around centers.', 'Consider both odd and even length palindromes.'],
+    [
+      { input: 'babad', expected_output: '3' },
+      { input: 'cbbd', expected_output: '2' },
+    ],
+    [
+      { input: 'a', expected_output: '1' },
+      { input: 'ac', expected_output: '1' },
+      { input: 'racecar', expected_output: '7' },
+    ],
+  ),
+  makeProblem(
+    20, 'Word Search', 'Medium', 'Backtracking', ['Backtracking', 'Matrix', 'DFS'],
+    'Given an m x n grid and a word, return true if word exists in the grid. Word can be built from adjacent cells (horizontal/vertical).',
+    'm n\\nboard rows\\nword',
+    '"true" or "false"',
+    'm == board.length, n == board[i].length',
+    [
+      { input: '3 4\\nA B C E\\nS F C S\\nA D E E\\nABCCED', output: 'true' },
+      { input: '3 4\\nA B C E\\nS F C S\\nA D E E\\nABCB', output: 'false' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Use DFS from each matching cell.', 'Mark visited and backtrack.'],
+    [
+      { input: '3 4\\nA B C E\\nS F C S\\nA D E E\\nABCCED', expected_output: 'true' },
+      { input: '3 4\\nA B C E\\nS F C S\\nA D E E\\nABCB', expected_output: 'false' },
+    ],
+    [
+      { input: '1 1\\nA\\nA', expected_output: 'true' },
+      { input: '1 1\\nA\\nB', expected_output: 'false' },
+    ],
+  ),
+  makeProblem(
+    21, 'Top K Frequent Elements', 'Medium', 'Heap', ['Heap', 'Hash Table'],
+    'Given nums and k, return k most frequent elements. Return count of unique elements in top k.',
+    'n k\\nnums (space-separated)',
+    'Single integer - count of unique elements in top k',
+    '1 <= nums.length <= 10^5',
+    [
+      { input: '6 2\\n1 1 1 2 2 3', output: '2' },
+      { input: '4 1\\n1 1 1 2', output: '1' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Count frequencies with a hash map.', 'Use a min-heap of size k to track top k.'],
+    [
+      { input: '6 2\\n1 1 1 2 2 3', expected_output: '2' },
+      { input: '4 1\\n1 1 1 2', expected_output: '1' },
+    ],
+    [
+      { input: '5 2\\n-1 -1 1 1 2', expected_output: '2' },
+      { input: '3 3\\n1 2 3', expected_output: '3' },
+    ],
+  ),
+  makeProblem(
+    22, 'LRU Cache', 'Medium', 'Design', ['Hash Table', 'Linked List', 'Design'],
+    'Design an LRU Cache. Process operations and output get results. Operations: put key val, get key.',
+    'n capacity\\nn lines: put key val or get key',
+    'For each get, print result on a new line',
+    '1 <= capacity <= 3000',
+    [
+      { input: '6 2\\nput 1 1\\nput 2 2\\nget 1\\nput 3 3\\nget 2\\nget 3', output: '1\\n-1\\n3' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Use a hash map + doubly linked list.', 'Move accessed nodes to tail (most recent).'],
+    [
+      { input: '6 2\\nput 1 1\\nput 2 2\\nget 1\\nput 3 3\\nget 2\\nget 3', expected_output: '1\\n-1\\n3' },
+    ],
+    [
+      { input: '4 1\\nput 2 1\\nget 2\\nput 3 2\\nget 2', expected_output: '1\\n-1' },
+    ],
+  ),
+  makeProblem(
+    23, 'Subtree of Another Tree', 'Easy', 'Tree', ['Tree', 'DFS', 'BFS'],
+    'Given roots of two binary trees, return true if subRoot is a subtree of root. Input is two level-order arrays.',
+    'n1\\nroot level-order\\nn2\\nsubRoot level-order',
+    '"true" or "false"',
+    '0 <= nodes <= 2000',
+    [
+      { input: '5\\n3 4 5 1 2\\n2\\n4 1 2', output: 'true' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Traverse root and check if any subtree matches subRoot.', 'Use serialization for comparison.'],
+    [
+      { input: '5\\n3 4 5 1 2\\n2\\n4 1 2', expected_output: 'true' },
+    ],
+    [
+      { input: '1\\n1\\n1\\n1', expected_output: 'true' },
+      { input: '3\\n1 2 3\\n1\\n4', expected_output: 'false' },
+    ],
+  ),
+  makeProblem(
+    24, 'Palindrome Number', 'Easy', 'Math', ['Math', 'String'],
+    'Given an integer x, return true if x is a palindrome integer.',
+    'Single integer x',
+    '"true" or "false"',
+    '-2^31 <= x <= 2^31 - 1',
+    [
+      { input: '121', output: 'true' },
+      { input: '-121', output: 'false' },
+      { input: '10', output: 'false' },
+    ],
+    ['Amazon', 'Google', 'Meta'],
+    ['Reverse half of the number.', 'Compare with the other half.'],
+    [
+      { input: '121', expected_output: 'true' },
+      { input: '-121', expected_output: 'false' },
+      { input: '10', expected_output: 'false' },
+    ],
+    [
+      { input: '0', expected_output: 'true' },
+      { input: '12321', expected_output: 'true' },
+      { input: '123', expected_output: 'false' },
+    ],
+  ),
+  makeProblem(
+    25, 'Container With Most Water', 'Medium', 'Array', ['Array', 'Two Pointers'],
+    'Given n non-negative integers representing vertical lines, find two lines that together with the x-axis form a container that contains the most water. Return the max area.',
+    'n\\nheights (space-separated)',
+    'Single integer - max area',
+    '2 <= n <= 10^5',
+    [
+      { input: '9\\n1 8 6 2 5 4 8 3 7', output: '49' },
+      { input: '2\\n1 1', output: '1' },
+    ],
+    ['Amazon', 'Google', 'Meta', 'Microsoft'],
+    ['Use two pointers at both ends.', 'Move the pointer with smaller height inward.'],
+    [
+      { input: '9\\n1 8 6 2 5 4 8 3 7', expected_output: '49' },
+      { input: '2\\n1 1', expected_output: '1' },
+    ],
+    [
+      { input: '4\\n1 2 4 3', expected_output: '4' },
+      { input: '5\\n2 3 4 5 18 17 6', expected_output: '17' },
+    ],
+  ),
+];
