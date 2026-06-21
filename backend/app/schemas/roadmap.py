@@ -39,6 +39,8 @@ class RoadmapDayProblemItem(BaseModel):
     difficulty: str
     topic: str
     tutorial_link: str | None = None
+    problem_path: str
+    editorial_path: str
 
 
 class RoadmapDayDetailResponse(BaseModel):
@@ -50,6 +52,10 @@ class RoadmapDayDetailResponse(BaseModel):
     task_type: str
     tutorial_title: str | None = None
     tutorial_link: str | None = None
+    tutorial_path: str
+    practice_path: str
+    external_resource_link: str | None = None
     status: str
     continue_problem_id: int | None = None
+    continue_problem_path: str | None = None
     problems: list[RoadmapDayProblemItem]

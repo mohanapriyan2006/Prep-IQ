@@ -48,14 +48,38 @@ export default function RoadmapDetail() {
         <h2 className="text-lg font-semibold text-[#E2E8F0]">{detail.topic}</h2>
         <p className="text-sm text-[#CBD5E1]">{detail.estimated_minutes} min • {detail.status}</p>
         <div className="flex flex-wrap gap-2">
-          {detail.continue_problem_id ? (
+          {detail.continue_problem_path ? (
             <button
               type="button"
-              onClick={() => navigate(`/problems/${detail.continue_problem_id}?roadmapDay=${detail.day_number}&source=roadmap`)}
+              onClick={() => navigate(detail.continue_problem_path!)}
               className="rounded-lg bg-[#1D4ED8] px-3 py-2 text-xs font-semibold text-white"
             >
               Continue Task
             </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => navigate(detail.tutorial_path)}
+            className="rounded-lg bg-[#2563EB] px-3 py-2 text-xs font-semibold text-white"
+          >
+            Open Tutorial
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(detail.practice_path)}
+            className="rounded-lg border border-[#334155] bg-[#111827] px-3 py-2 text-xs font-semibold text-[#E2E8F0]"
+          >
+            Practice Problems
+          </button>
+          {detail.external_resource_link ? (
+            <a
+              href={detail.external_resource_link}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-lg border border-[#334155] bg-[#111827] px-3 py-2 text-xs font-semibold text-[#93C5FD]"
+            >
+              External Resource
+            </a>
           ) : null}
           <Link to="/roadmap" className="rounded-lg border border-[#334155] bg-[#111827] px-3 py-2 text-xs font-semibold text-[#E2E8F0]">
             Back To Roadmap
@@ -70,7 +94,10 @@ export default function RoadmapDetail() {
             <div key={problem.id} className="rounded-xl border border-[#1F2937]/60 bg-[#0F172A] p-3 text-sm text-[#CBD5E1]">
               <p className="font-semibold text-[#E2E8F0]">{problem.title}</p>
               <p className="mt-1 text-xs text-[#94A3B8]">{problem.difficulty} • {problem.topic}</p>
-              <Link to={`/problems/${problem.id}`} className="mt-2 inline-block text-xs font-semibold text-[#60A5FA] underline underline-offset-2">Open Problem</Link>
+              <div className="mt-2 flex flex-wrap gap-3 text-xs font-semibold">
+                <Link to={problem.problem_path} className="text-[#60A5FA] underline underline-offset-2">Open Problem</Link>
+                <Link to={problem.editorial_path} className="text-[#93C5FD] underline underline-offset-2">Open Editorial</Link>
+              </div>
             </div>
           ))}
         </div>

@@ -12,6 +12,8 @@ class SurveySubmitRequest(BaseModel):
     preferred_language: Literal["cpp", "java", "python"]
     preparation_start_date: date
     goal_timeline_months: Literal[3, 6]
+    weak_areas: list[str] = Field(default_factory=list, max_length=10)
+    confidence_level: int | None = Field(default=None, ge=1, le=10)
 
 
 class SurveyReadResponse(BaseModel):
@@ -23,5 +25,7 @@ class SurveyReadResponse(BaseModel):
     preferred_language: str
     preparation_start_date: date
     goal_timeline_months: int
+    weak_areas: list[str] | None = None
+    confidence_level: int | None = None
     created_at: datetime
     updated_at: datetime

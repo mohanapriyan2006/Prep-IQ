@@ -91,16 +91,48 @@ class PlatformConnectorService:
             }
 
     def fetch_gfg_stats(self, username: str) -> dict:
-        url = f"https://auth.geeksforgeeks.org/user/{quote(username)}/"
-        try:
-            html = self._http_text(url)
-        except (HTTPError, URLError, TimeoutError):
-            html = ""
+        encoded = quote(username)
+        urls = [
+            f"https://www.geeksforgeeks.org/user/{encoded}/",
+            f"https://www.geeksforgeeks.org/user/{encoded}/practice/",
+            f"https://auth.geeksforgeeks.org/user/{encoded}/",
+            f"https://auth.geeksforgeeks.org/user/{encoded}/practice/",
+        ]
 
-        easy = self._extract_first_int(html, r"Easy[^0-9]*(\\d+)")
-        medium = self._extract_first_int(html, r"Medium[^0-9]*(\\d+)")
-        hard = self._extract_first_int(html, r"Hard[^0-9]*(\\d+)")
-        total = self._extract_first_int(html, r"Problem[s]? Solved[^0-9]*(\\d+)")
+        html = ""
+        for url in urls:
+            try:
+                html = self._http_text(url)
+                if html and "404" not in html[:4000]:
+                    break
+            except (HTTPError, URLError, TimeoutError):
+                continue
+
+        easy_patterns = [
+            r"Easy[^0-9]{0,40}(\\d+)",
+            r'"easySolved"\s*:\s*(\\d+)',
+            r'"easy_count"\s*:\s*(\\d+)',
+        ]
+        medium_patterns = [
+            r"Medium[^0-9]{0,40}(\\d+)",
+            r'"mediumSolved"\s*:\s*(\\d+)',
+            r'"medium_count"\s*:\s*(\\d+)',
+        ]
+        hard_patterns = [
+            r"Hard[^0-9]{0,40}(\\d+)",
+            r'"hardSolved"\s*:\s*(\\d+)',
+            r'"hard_count"\s*:\s*(\\d+)',
+        ]
+        total_patterns = [
+            r"Problem[s]?\s+Solved[^0-9]{0,40}(\\d+)",
+            r'"totalProblemsSolved"\s*:\s*(\\d+)',
+            r'"total_solved"\s*:\s*(\\d+)',
+        ]
+
+        easy = self._extract_from_patterns(html, easy_patterns)
+        medium = self._extract_from_patterns(html, medium_patterns)
+        hard = self._extract_from_patterns(html, hard_patterns)
+        total = self._extract_from_patterns(html, total_patterns)
 
         if total == 0:
             total = easy + medium + hard
@@ -126,6 +158,13 @@ class PlatformConnectorService:
             return int(match.group(1))
         except (TypeError, ValueError):
             return 0
+
+    def _extract_from_patterns(self, text: str, patterns: list[str]) -> int:
+        for pattern in patterns:
+            value = self._extract_first_int(text, pattern)
+            if value > 0:
+                return value
+        return 0
 
     def _fetch_for_platform(self, platform: str, username: str) -> dict:
         normalized = platform.lower().strip()

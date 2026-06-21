@@ -18,6 +18,8 @@ class OnboardingSurvey(Base):
     preferred_language: Mapped[str] = mapped_column(String(32), nullable=False)
     preparation_start_date: Mapped[date] = mapped_column(Date, nullable=False)
     goal_timeline_months: Mapped[int] = mapped_column(Integer, nullable=False)
+    weak_areas: Mapped[list[str] | None] = mapped_column(JSON, nullable=True, default=list)
+    confidence_level: Mapped[int | None] = mapped_column(Integer, nullable=True) # 1-10 string mapped to what they feel
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 

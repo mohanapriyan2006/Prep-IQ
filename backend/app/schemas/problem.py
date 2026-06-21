@@ -63,16 +63,25 @@ class CodeReviewRequest(BaseModel):
 
 
 class CodeReviewResponse(BaseModel):
+    review_source: str
     verdict: str
+    summary: str
     time_complexity: str
     space_complexity: str
     optimal_solution: str
     improvements: list[str]
     alternative_approach: str
+    correctness_analysis: str
+    complexity_analysis: str
+    maintainability_analysis: str
+    interview_readiness: str
+    next_steps: list[str]
+    confidence: int
 
 
 class EditorialResponse(BaseModel):
     concept_explanation: str
     step_by_step: list[str]
     optimized_code: str
+    tutorial_topic: str | None = None
     tutorial_link: str | None = None

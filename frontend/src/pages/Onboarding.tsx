@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Circle, CircleDashed, Sparkles } from 'lucide-react';
 
 import { AuthRequiredCard } from '../components/auth/AuthRequiredCard';
@@ -9,6 +10,7 @@ import {
   fetchAssessmentSummary,
   fetchSurvey,
   generateRoadmap,
+  api,
   submitSurvey,
 } from '../services/api';
 import type { AssessmentProblem, AssessmentSummary, SurveyPayload } from '../types/coding';
@@ -25,6 +27,7 @@ const initialState: SurveyPayload = {
 
 export default function Onboarding() {
   const { isAuthenticated, openAuthModal } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState<SurveyPayload>(initialState);
   const [step, setStep] = useState(1);
   const [skipAssessment, setSkipAssessment] = useState(false);
@@ -118,6 +121,22 @@ export default function Onboarding() {
       setErrorText('Roadmap generation failed. Ensure survey is saved, then retry generation.');
     } finally {
       setGeneratingRoadmap(false);
+    }
+  };
+
+  const handleStartDsaAssessment = async () => {
+    if (!isAuthenticated) {
+      openAuthModal('login');
+      return;
+    }
+
+    setErrorText(null);
+    try {
+      const response = await api.post('/assessment/start');
+      navigate(`/assessment/${response.data.session_id}/arena`);
+    } catch {
+      setErrorText('Unable to start DSA assessment. Opening assessment tab instead.');
+      navigate('/assessment');
     }
   };
 
@@ -372,6 +391,13 @@ export default function Onboarding() {
               </>
             )}
             <div className="flex gap-2">
+              <button
+                onClick={() => void handleStartDsaAssessment()}
+                disabled={skipAssessment}
+                className="rounded-lg border border-[#334155] bg-[#11161D] px-4 py-2 text-sm text-[#CBD5E1] disabled:opacity-50"
+              >
+                Start DSA Test
+              </button>
               <button
                 onClick={() => void handleGenerateRoadmap()}
                 disabled={!canProceedToGenerate || generatingRoadmap}

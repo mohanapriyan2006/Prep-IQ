@@ -1,7 +1,6 @@
 import { useLocation } from 'react-router-dom';
-import { BellDot, Search, Flame, Menu, LogIn, UserPlus, LogOut, SlidersHorizontal } from 'lucide-react';
+import { BellDot, Search, Flame, Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../../context/useAuth';
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/': { title: 'Dashboard', subtitle: 'AI-powered overview of your placement readiness' },
@@ -27,7 +26,6 @@ interface NavbarProps {
 export function Navbar({ onMenuClick }: NavbarProps) {
   const location = useLocation();
   const pageInfo = resolvePageInfo(location.pathname);
-  const { isAuthenticated, authEmail, openAuthModal, openSetupModal, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 h-20 bg-[#0B0F14]/90 backdrop-blur-xl border-b border-[#222A33]">
@@ -77,45 +75,6 @@ export function Navbar({ onMenuClick }: NavbarProps) {
             <BellDot className="w-4 h-4 text-[#9CA3AF]" />
             <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#6366F1] border-2 border-[#0B1120]" />
           </button>
-
-          {isAuthenticated ? (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={openSetupModal}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#1F2937]/70 bg-[#111827]/70 px-3 py-2 text-xs font-semibold text-[#E5E7EB] hover:bg-[#1F2937]/70"
-              >
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Setup</span>
-              </button>
-              <div className="hidden md:block rounded-lg border border-[#1F2937]/60 bg-[#111827]/70 px-3 py-2 text-xs text-[#CBD5E1]">
-                {authEmail ?? 'Authenticated'}
-              </div>
-              <button
-                onClick={logout}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 px-3 py-2 text-xs font-semibold text-[#FCA5A5] hover:bg-[#EF4444]/15"
-              >
-                <LogOut className="h-3.5 w-3.5" />
-                Logout
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => openAuthModal('login')}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#1F2937]/70 bg-[#111827]/70 px-3 py-2 text-xs font-semibold text-[#E5E7EB] hover:bg-[#1F2937]/70"
-              >
-                <LogIn className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Login</span>
-              </button>
-              <button
-                onClick={() => openAuthModal('register')}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-[#2563EB] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1D4ED8]"
-              >
-                <UserPlus className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Register</span>
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </header>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BrainCircuit, Building2, CheckCircle2, Gauge, PlayCircle, RefreshCw, Timer } from 'lucide-react';
+import { ArrowRight, BrainCircuit, Building2, CheckCircle2, Gauge, PlayCircle, RefreshCw, Timer } from 'lucide-react';
 
 import { AuthRequiredCard } from '../components/auth/AuthRequiredCard';
 import { Card } from '../components/ui/Card';
@@ -12,6 +12,7 @@ import {
   evaluateMockTest,
   fetchMockTestCategories,
   startMockTest,
+  api,
 } from '../services/api';
 import type {
   MockTestEvaluateResponse,
@@ -29,6 +30,7 @@ type HistoryEntry = MockTestEvaluateResponse & {
 const HISTORY_KEY = 'prepiq_mock_history';
 
 export default function MockTest() {
+  const navigate = useNavigate();
   const { isAuthenticated, openAuthModal } = useAuth();
   const [categories, setCategories] = useState<{ pattern_categories: string[]; company_categories: string[] }>({
     pattern_categories: [],
@@ -121,6 +123,23 @@ export default function MockTest() {
     }
   };
 
+  const onLaunchAssessmentArena = async () => {
+    if (!isAuthenticated) {
+      openAuthModal('login');
+      return;
+    }
+    setLoading(true);
+    setRequestError('');
+    try {
+      const response = await api.post('/assessment/start');
+      navigate(`/assessment/${response.data.session_id}/arena`);
+    } catch {
+      setRequestError('Unable to start Assessment Arena right now. Please retry in a few seconds.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onEvaluate = async () => {
     if (!session) return;
     setLoading(true);
@@ -162,19 +181,29 @@ export default function MockTest() {
         subtitle="Company-wise, pattern-wise, and overall interview simulation"
         icon={<Gauge className="h-5 w-5 text-[#6366F1]" />}
         action={
-          <button
-            onClick={() => {
-              if (!isAuthenticated) return;
-              void (async () => {
-                const data = await fetchMockTestCategories().catch(() => ({ pattern_categories: [], company_categories: [] }));
-                setCategories(data);
-              })();
-            }}
-            className="inline-flex items-center gap-2 rounded-lg border border-[#1F2937] bg-[#111827] px-3 py-2 text-xs font-semibold text-[#E5E7EB]"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            Refresh
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => void onLaunchAssessmentArena()}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-3 py-2 text-xs font-semibold text-white disabled:opacity-60"
+            >
+              <ArrowRight className="h-3.5 w-3.5" />
+              Start In Assessment Arena
+            </button>
+            <button
+              onClick={() => {
+                if (!isAuthenticated) return;
+                void (async () => {
+                  const data = await fetchMockTestCategories().catch(() => ({ pattern_categories: [], company_categories: [] }));
+                  setCategories(data);
+                })();
+              }}
+              className="inline-flex items-center gap-2 rounded-lg border border-[#1F2937] bg-[#111827] px-3 py-2 text-xs font-semibold text-[#E5E7EB]"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Refresh
+            </button>
+          </div>
         }
       />
 

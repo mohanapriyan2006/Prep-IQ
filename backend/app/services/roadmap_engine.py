@@ -54,10 +54,18 @@ class RoadmapEngine:
             return 8
         return max(1, min(80, weekly_hours))
 
-    def _topic_cycle(self, weak_topics: list[str]) -> list[str]:
+    def _default_topics(self, db: Session) -> list[str]:
+        dynamic_topics = [
+            topic
+            for topic in db.scalars(select(Problem.topic).distinct().order_by(Problem.topic.asc())).all()
+            if topic and topic.strip()
+        ]
+        return dynamic_topics or DEFAULT_TOPICS
+
+    def _topic_cycle(self, db: Session, weak_topics: list[str]) -> list[str]:
         seen: set[str] = set()
         ordered: list[str] = []
-        for topic in [*weak_topics, *DEFAULT_TOPICS]:
+        for topic in [*weak_topics, *self._default_topics(db)]:
             if topic in seen:
                 continue
             seen.add(topic)
@@ -122,9 +130,9 @@ class RoadmapEngine:
         ranked = sorted(topic_score.items(), key=lambda item: item[1], reverse=True)
         return [topic for topic, _ in ranked if topic]
 
-    def _sanitize_focus_topics(self, topics: list[str], weak_topics: list[str]) -> list[str]:
+    def _sanitize_focus_topics(self, db: Session, topics: list[str], weak_topics: list[str]) -> list[str]:
         weak_lookup = {topic.lower(): topic for topic in weak_topics}
-        default_lookup = {topic.lower(): topic for topic in DEFAULT_TOPICS}
+        default_lookup = {topic.lower(): topic for topic in self._default_topics(db)}
 
         normalized: list[str] = []
         seen: set[str] = set()
@@ -240,6 +248,7 @@ class RoadmapEngine:
 
     def _derive_strategy(
         self,
+        db: Session,
         user: User,
         survey: OnboardingSurvey,
         weekly_hours: int,
@@ -269,7 +278,7 @@ class RoadmapEngine:
                 if not isinstance(raw_topics, list):
                     raise ValueError("focus_topics must be an array")
 
-                clean_topics = self._sanitize_focus_topics([str(item) for item in raw_topics], weak_topics)
+                clean_topics = self._sanitize_focus_topics(db, [str(item) for item in raw_topics], weak_topics)
                 if not clean_topics:
                     raise ValueError("No valid focus topics from provider")
 
@@ -283,7 +292,7 @@ class RoadmapEngine:
             except (ValueError, KeyError, HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
                 failures.append(f"{provider_name}: {exc}")
 
-        fallback_topics = self._topic_cycle([*assessment_topics[:5], *weak_topics[:6]])[:8]
+        fallback_topics = self._topic_cycle(db, [*assessment_topics[:5], *weak_topics[:6]])[:8]
         return StrategyResult(
             provider="rule-based",
             focus_topics=fallback_topics,
@@ -310,8 +319,9 @@ class RoadmapEngine:
             weak_topics=weak_topics,
             assessment_topics=assessment_topics,
             company_weights=company_weights,
+            db=db,
         )
-        topic_cycle = self._topic_cycle(strategy.focus_topics)
+        topic_cycle = self._topic_cycle(db, strategy.focus_topics)
 
         existing_plans = list(
             db.scalars(select(RoadmapPlan).where(RoadmapPlan.user_id == user.id, RoadmapPlan.is_active.is_(True))).all()

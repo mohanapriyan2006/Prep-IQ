@@ -12,6 +12,36 @@ interface TutorialViewerProps {
   practiceProblemLinks: Array<{ label: string; href: string }>;
 }
 
+function toYoutubeEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace('www.', '').toLowerCase();
+
+    if (host === 'youtu.be') {
+      const id = parsed.pathname.split('/').filter(Boolean)[0];
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+
+    if (host.includes('youtube.com')) {
+      if (parsed.pathname.startsWith('/embed/')) {
+        return url;
+      }
+      const id = parsed.searchParams.get('v');
+      if (id) {
+        return `https://www.youtube.com/embed/${id}`;
+      }
+      const shortsMatch = parsed.pathname.match(/^\/shorts\/([^/]+)/);
+      if (shortsMatch?.[1]) {
+        return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 export function TutorialViewer({ tutorial, roadmapHint, practiceProblemLinks }: TutorialViewerProps) {
   const videos = tutorial.video_links ?? [];
   const articleSnippets = tutorial.article_snippets ?? [];
@@ -53,16 +83,28 @@ export function TutorialViewer({ tutorial, roadmapHint, practiceProblemLinks }: 
             <p className="mb-2 text-xs uppercase tracking-wide text-[#9CA3AF]">Video Lessons</p>
             <div className="space-y-2">
               {videos.slice(0, 3).map((url, index) => (
-                <a
-                  key={`${tutorial.topic}-video-${url}`}
-                  href={url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center justify-between rounded-lg border border-[#334155] bg-[#0F141A] px-3 py-2 text-xs text-[#93C5FD] hover:border-[#3B82F6]/50"
-                >
-                  <span>Video {index + 1}</span>
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
+                <div key={`${tutorial.topic}-video-${url}`} className="space-y-2">
+                  {toYoutubeEmbedUrl(url) ? (
+                    <iframe
+                      src={toYoutubeEmbedUrl(url) ?? undefined}
+                      title={`${tutorial.title} video ${index + 1}`}
+                      className="h-48 w-full rounded-lg border border-[#334155] bg-[#0F141A]"
+                      loading="lazy"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                    />
+                  ) : null}
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between rounded-lg border border-[#334155] bg-[#0F141A] px-3 py-2 text-xs text-[#93C5FD] hover:border-[#3B82F6]/50"
+                  >
+                    <span>Open Video {index + 1}</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
               ))}
             </div>
           </div>

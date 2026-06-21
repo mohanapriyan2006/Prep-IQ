@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.dependencies import get_current_user
-from app.models.assessment import AssessmentAttempt
+from app.models.assessment import AssessmentAttempt, AssessmentSession
 from app.models.problem import Problem
 from app.models.user import User
 from app.schemas.assessment import (
@@ -16,8 +16,65 @@ from app.schemas.assessment import (
     AssessmentSummaryResponse,
 )
 from app.services.testcase_runner import testcase_runner
+from app.services.assessment_engine import assessment_engine
+from typing import Dict, Any
 
 router = APIRouter(prefix="/assessment", tags=["assessment"])
+
+@router.post("/start")
+def start_assessment(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Dict[str, Any]:
+    session = assessment_engine.generate_dsa_test(db, current_user.id)
+    return {
+        "session_id": session.id,
+        "type": session.type,
+        "problems": session.metrics.get("problems", []),
+        "duration_minutes": session.duration_minutes
+    }
+
+@router.post("/{session_id}/finalize")
+def finalize_assessment(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Dict[str, Any]:
+    session = assessment_engine.finalize_dsa_test(db, session_id)
+    if not session or session.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail="Session not found")
+        
+    return {
+        "status": session.status,
+        "score": session.total_score,
+        "accuracy": session.accuracy,
+        "metrics": session.metrics
+    }
+    
+@router.get("/sessions")
+def get_assessment_sessions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[Dict[str, Any]]:
+    sessions = db.scalars(
+        select(AssessmentSession)
+        .where(AssessmentSession.user_id == current_user.id)
+        .order_by(AssessmentSession.start_time.desc())
+    ).all()
+    
+    return [
+        {
+            "id": s.id,
+            "type": s.type,
+            "status": s.status,
+            "total_score": s.total_score,
+            "accuracy": s.accuracy,
+            "start_time": s.start_time,
+            "end_time": s.end_time,
+            "duration_minutes": s.duration_minutes,
+            "metrics": s.metrics or {},
+        } for s in sessions
+    ]
 
 ASSESSMENT_TOPICS = {"Arrays", "Strings", "Recursion", "Hashing", "Binary Search", "Searching"}
 ASSESSMENT_DISTRIBUTION = {"Easy": 5, "Medium": 3, "Hard": 1}
@@ -80,6 +137,7 @@ def submit_assessment(
 
     attempt = AssessmentAttempt(
         user_id=current_user.id,
+        assessment_session_id=payload.session_id,
         problem_id=problem.id,
         language=payload.language,
         code=payload.code,
@@ -87,6 +145,7 @@ def submit_assessment(
         runtime_ms=result.max_runtime_ms,
         passed_testcases=result.passed,
         total_testcases=result.total,
+        time_taken_seconds=payload.time_taken_seconds,
     )
     db.add(attempt)
     db.commit()

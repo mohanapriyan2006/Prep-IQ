@@ -330,6 +330,87 @@ PROBLEMS = [
     },
 ]
 
+
+def _build_problem(
+    title: str,
+    difficulty: str,
+    topic: str,
+    sample_input: str,
+    sample_output: str,
+    description: str,
+    *,
+    is_premium: bool = False,
+) -> dict:
+    return {
+        "title": title,
+        "difficulty": difficulty,
+        "topic": topic,
+        "topic_tags": [topic],
+        "is_premium": is_premium,
+        "description": description,
+        "input_format": "Read input from standard input as defined in the problem statement.",
+        "output_format": "Print the expected result exactly as required.",
+        "constraints": "Follow standard interview constraints for this problem.",
+        "examples": [
+            {"input": sample_input, "output": sample_output},
+        ],
+        "company_tags": ["Amazon", "Google", "Microsoft"],
+        "hints": [
+            "Start with the brute-force approach first.",
+            "Then optimize using the topic-specific pattern.",
+        ],
+        "visible_testcases": [
+            {"input": sample_input, "expected_output": sample_output},
+        ],
+        "hidden_testcases": [
+            {"input": sample_input, "expected_output": sample_output},
+        ],
+    }
+
+
+PROBLEMS.extend(
+    [
+        _build_problem("Subarray Sum Equals K", "Medium", "Array", "1 1 1\n2", "2", "Count contiguous subarrays whose sum equals k."),
+        _build_problem("3Sum", "Medium", "Array", "-1 0 1 2 -1 -4", "-1 -1 2 | -1 0 1", "Return unique triplets that sum to zero."),
+        _build_problem("Minimum Window Substring", "Hard", "String", "ADOBECODEBANC\nABC", "BANC", "Find the minimum window substring containing all characters of t."),
+        _build_problem("Palindrome Partitioning", "Medium", "Backtracking", "aab", "a a b | aa b", "Return all palindrome partitionings of the string."),
+        _build_problem("Clone Graph", "Medium", "Graph", "1-2,1-4,2-3,3-4", "cloned", "Clone an undirected graph and return the cloned structure."),
+        _build_problem("Word Ladder", "Hard", "Graph", "hit\ncog\nhot dot dog lot log cog", "5", "Find shortest transformation sequence length between words."),
+        _build_problem("House Robber", "Medium", "DP", "1 2 3 1", "4", "Maximize robbed money without taking adjacent houses."),
+        _build_problem("Decode Ways", "Medium", "DP", "226", "3", "Count the number of valid decodings of a digit string."),
+        _build_problem("Kth Largest Element", "Medium", "Heap", "3 2 1 5 6 4\n2", "5", "Find the k-th largest element in an unsorted array."),
+        _build_problem("Top K Frequent Elements", "Medium", "Heap", "1 1 1 2 2 3\n2", "1 2", "Return the k most frequent elements."),
+        _build_problem("Implement Trie", "Medium", "Trie", "insert apple; search apple; startsWith app", "true true", "Implement insert/search/prefix operations in a Trie."),
+        _build_problem("Longest Increasing Subsequence", "Medium", "DP", "10 9 2 5 3 7 101 18", "4", "Find length of the longest strictly increasing subsequence."),
+        _build_problem("Median of Two Sorted Arrays", "Hard", "Binary Search", "1 3\n2", "2.0", "Find the median of two sorted arrays in log complexity."),
+        _build_problem("Spiral Matrix", "Medium", "Array", "1 2 3;4 5 6;7 8 9", "1 2 3 6 9 8 7 4 5", "Return elements of the matrix in spiral order."),
+        _build_problem("Reorder List", "Medium", "Linked List", "1 2 3 4", "1 4 2 3", "Reorder linked list L0->Ln->L1->Ln-1 pattern."),
+        _build_problem("Diameter of Binary Tree", "Easy", "Tree", "1 2 3 4 5", "3", "Return the length of the longest path between two nodes."),
+        _build_problem("Serialize and Deserialize Tree", "Hard", "Tree", "1 2 3 null null 4 5", "1 2 3 null null 4 5", "Serialize and deserialize a binary tree consistently."),
+        _build_problem("Sliding Window Maximum", "Hard", "Queue", "1 3 -1 -3 5 3 6 7\n3", "3 3 5 5 6 7", "Return max value in each sliding window."),
+        _build_problem("N Queens", "Hard", "Backtracking", "4", "2", "Return the number of valid N-Queens configurations."),
+        _build_problem("Course Schedule II", "Medium", "Graph", "4\n1 0,2 0,3 1,3 2", "0 1 2 3", "Return a valid course order using topological sorting."),
+        _build_problem("Unique Paths", "Medium", "DP", "3 7", "28", "Count unique paths from top-left to bottom-right in a grid."),
+        _build_problem("Word Break", "Medium", "DP", "leetcode\nleet code", "true", "Check if string can be segmented with dictionary words."),
+        _build_problem("Merge Intervals", "Medium", "Greedy", "1 3,2 6,8 10,15 18", "1 6,8 10,15 18", "Merge all overlapping intervals."),
+        _build_problem("Insert Interval", "Medium", "Greedy", "1 3,6 9\n2 5", "1 5,6 9", "Insert a new interval and merge overlaps."),
+        _build_problem("Find Minimum in Rotated Sorted Array", "Medium", "Binary Search", "3 4 5 1 2", "1", "Find minimum element in a rotated sorted array."),
+        _build_problem("4Sum", "Medium", "Array", "1 0 -1 0 -2 2\n0", "-2 -1 1 2 | -2 0 0 2 | -1 0 0 1", "Return unique quadruplets that sum to target."),
+        _build_problem("Continuous Subarray Sum", "Medium", "Array", "23 2 4 6 7\n6", "true", "Check if subarray sum is a multiple of k."),
+        _build_problem("Path Sum", "Easy", "Tree", "5 4 8 11 null 13 4 7 2 null null null 1\n22", "true", "Check if root-to-leaf path equals target sum."),
+        _build_problem("Path Sum II", "Medium", "Tree", "5 4 8 11 null 13 4 7 2 null null 5 1\n22", "2", "Return all root-to-leaf paths that sum to target."),
+        _build_problem("Path Sum III", "Medium", "Tree", "10 5 -3 3 2 null 11 3 -2 null 1\n8", "3", "Count all downward paths whose values sum to target."),
+        _build_problem("Target Sum", "Medium", "DP", "1 1 1 1 1\n3", "5", "Count ways to assign +/- signs to reach target."),
+        _build_problem("Combination Sum", "Medium", "Backtracking", "2 3 6 7\n7", "2 2 3 | 7", "Return combinations where numbers sum to target."),
+        _build_problem("Combination Sum II", "Medium", "Backtracking", "10 1 2 7 6 1 5\n8", "1 1 6 | 1 2 5 | 1 7 | 2 6", "Return unique combinations where each element is used once."),
+        _build_problem("Max Sum of Rectangle No Larger Than K", "Hard", "DP", "1 0 1;0 -2 3\n2", "2", "Find max rectangle sum no larger than k.", is_premium=True),
+        _build_problem("2D Range Sum Query - Mutable", "Hard", "Segment Tree", "NumMatrix init; sumRegion 2 1 4 3", "8", "Design mutable 2D range sum query data structure.", is_premium=True),
+        _build_problem("Maximum Sum of 3 Non-Overlapping Subarrays", "Hard", "DP", "1 2 1 2 6 7 5 1\n2", "0 3 5", "Find starting indices of three non-overlapping subarrays with max total sum.", is_premium=True),
+        _build_problem("Split Array Largest Sum", "Hard", "Binary Search", "7 2 5 10 8\n2", "18", "Split array into m parts minimizing largest part sum.", is_premium=True),
+        _build_problem("Maximum Subarray Sum With One Deletion", "Medium", "DP", "1 -2 0 3", "4", "Find max subarray sum when one deletion is allowed.", is_premium=True),
+    ]
+)
+
 COMPANY_PATTERNS = [
     {"company": "Amazon", "topic": "Graphs", "weight": 0.3},
     {"company": "Amazon", "topic": "Dynamic Programming", "weight": 0.25},
@@ -493,15 +574,16 @@ def seed():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
-        existing_problems = db.query(Problem).count()
-        if existing_problems == 0:
-            for data in PROBLEMS:
-                seed_data = {**data, "tutorial_link": TOPIC_TUTORIAL_MAP.get(data["topic"])}
-                problem = Problem(**seed_data)
-                db.add(problem)
-            print(f"Prepared {len(PROBLEMS)} problems for insert.")
-        else:
-            print(f"Database already has {existing_problems} problems. Skipping problem insert.")
+        existing_titles = {row[0] for row in db.query(Problem.title).all()}
+        inserted_count = 0
+        for data in PROBLEMS:
+            if data["title"] in existing_titles:
+                continue
+            seed_data = {**data, "tutorial_link": TOPIC_TUTORIAL_MAP.get(data["topic"])}
+            problem = Problem(**seed_data)
+            db.add(problem)
+            inserted_count += 1
+        print(f"Prepared {inserted_count} new problems for insert ({len(PROBLEMS)} total seed definitions).")
 
         existing_patterns = db.query(CompanyPattern).count()
         if existing_patterns == 0:

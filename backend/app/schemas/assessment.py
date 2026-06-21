@@ -18,6 +18,9 @@ class AssessmentProblem(BaseModel):
 class AssessmentSubmitRequest(BaseModel):
     problem_id: int
     language: str = Field(pattern="^(cpp|python|java)$")
+    code: str
+    session_id: int | None = None
+    time_taken_seconds: int | None = None
     code: str = Field(min_length=1, max_length=100000)
 
 

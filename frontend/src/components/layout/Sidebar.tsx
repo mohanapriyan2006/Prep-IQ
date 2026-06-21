@@ -12,15 +12,20 @@ import {
   Trophy,
   UserCircle2,
   Timer,
+  LogIn,
+  UserPlus,
+  LogOut,
+  SlidersHorizontal,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../context/useAuth';
 
 const navItems = [
   { label: 'Dashboard', path: '/', icon: Gauge },
+  { label: 'Assessment', path: '/assessment', icon: Timer },
   { label: 'Problems', path: '/problems', icon: CodeXml },
   { label: 'Roadmap', path: '/roadmap', icon: Compass },
-  { label: 'Mock Test', path: '/mock-test', icon: Timer },
   { label: 'Analytics', path: '/analytics', icon: PieChart },
   { label: 'Tutorials', path: '/tutorials', icon: BookOpenText },
   { label: 'Contests', path: '/contests', icon: Trophy },
@@ -33,6 +38,8 @@ interface SidebarProps {
 }
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+  const { isAuthenticated, authEmail, openAuthModal, openSetupModal, logout } = useAuth();
+
   return (
     <>
       {/* Logo */}
@@ -98,16 +105,64 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       {/* Bottom section */}
-      <div className="px-4 py-5 border-t border-[#1F2937]/50">
+      <div className="space-y-3 px-4 py-5 border-t border-[#1F2937]/50">
         <div className="flex items-center gap-3 px-2">
           <div className="w-9 h-9 rounded-full bg-[#1D4ED8] flex items-center justify-center text-white text-sm font-bold">
-            A
+            {(authEmail?.charAt(0) ?? 'G').toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-[#E5E7EB] truncate">Alex Chen</p>
-            <p className="text-xs text-[#9CA3AF] truncate">Placement Prep</p>
+            <p className="text-sm font-medium text-[#E5E7EB] truncate">{isAuthenticated ? authEmail ?? 'Authenticated User' : 'Guest User'}</p>
+            <p className="text-xs text-[#9CA3AF] truncate">{isAuthenticated ? 'Placement Prep' : 'Login to start tracking'}</p>
           </div>
         </div>
+
+        {isAuthenticated ? (
+          <div className="grid grid-cols-1 gap-2">
+            <button
+              onClick={() => {
+                openSetupModal();
+                onNavigate?.();
+              }}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#1F2937]/70 bg-[#111827]/70 px-3 py-2 text-xs font-semibold text-[#E5E7EB] hover:bg-[#1F2937]/70"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              Setup
+            </button>
+            <button
+              onClick={() => {
+                logout();
+                onNavigate?.();
+              }}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 px-3 py-2 text-xs font-semibold text-[#FCA5A5] hover:bg-[#EF4444]/15"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => {
+                openAuthModal('login');
+                onNavigate?.();
+              }}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#1F2937]/70 bg-[#111827]/70 px-3 py-2 text-xs font-semibold text-[#E5E7EB] hover:bg-[#1F2937]/70"
+            >
+              <LogIn className="h-3.5 w-3.5" />
+              Login
+            </button>
+            <button
+              onClick={() => {
+                openAuthModal('register');
+                onNavigate?.();
+              }}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#2563EB] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1D4ED8]"
+            >
+              <UserPlus className="h-3.5 w-3.5" />
+              Register
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

@@ -22,6 +22,7 @@ from app.routers import (
     submissions,
     survey,
     tutorials,
+    stats_router,
 )
 from app.services.contest_service import contest_service
 from app.services.analysis_engine import analysis_engine
@@ -86,6 +87,16 @@ def on_startup() -> None:
         conn.execute(text("ALTER TABLE tutorials ADD COLUMN IF NOT EXISTS article_snippets JSON"))
         conn.execute(text("UPDATE tutorials SET video_links = COALESCE(video_links, '[]'::json)"))
         conn.execute(text("UPDATE tutorials SET article_snippets = COALESCE(article_snippets, '[]'::json)"))
+        
+        # PrepIQ Upgrade Patches
+        conn.execute(text("ALTER TABLE tutorials ADD COLUMN IF NOT EXISTS content TEXT"))
+        conn.execute(text("ALTER TABLE tutorials ADD COLUMN IF NOT EXISTS difficulty_level VARCHAR(32) DEFAULT 'Easy'"))
+        conn.execute(text("ALTER TABLE problems ADD COLUMN IF NOT EXISTS tutorial_id INTEGER"))
+        conn.execute(text("ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS assessment_session_id INTEGER"))
+        conn.execute(text("ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS time_taken_seconds INTEGER"))
+        conn.execute(text("ALTER TABLE assessment_attempts ADD COLUMN IF NOT EXISTS attempt_count INTEGER DEFAULT 1"))
+        conn.execute(text("ALTER TABLE onboarding_surveys ADD COLUMN IF NOT EXISTS weak_areas JSON"))
+        conn.execute(text("ALTER TABLE onboarding_surveys ADD COLUMN IF NOT EXISTS confidence_level INTEGER"))
 
     def sync_contests_job() -> None:
         db = SessionLocal()
@@ -134,3 +145,4 @@ app.include_router(analytics.router)
 app.include_router(tutorials.router)
 app.include_router(mock_router.router)
 app.include_router(ai_router.router)
+app.include_router(stats_router.router)

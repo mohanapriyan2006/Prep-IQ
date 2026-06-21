@@ -10,13 +10,14 @@ import { useState } from 'react';
 export function MainLayout() {
   const location = useLocation();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const isWorkspaceRoute = location.pathname.startsWith('/problems/');
 
   return (
-    <div className="flex min-h-screen bg-[#0B1120]">
+    <div className="flex min-h-screen bg-[#0B0F14]">
       <Sidebar mobileOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
       <div className="flex-1 lg:ml-65">
         <Navbar onMenuClick={() => setMobileSidebarOpen((prev) => !prev)} />
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main className={isWorkspaceRoute ? 'p-3 sm:p-4 lg:p-5' : 'p-4 sm:p-6 lg:p-8'}>
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

@@ -12,6 +12,7 @@ export interface Problem {
   title: string;
   topic: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
+  isPremium?: boolean;
   timeTaken?: number;
   attemptCount?: number;
   confidence?: number; // 1-5

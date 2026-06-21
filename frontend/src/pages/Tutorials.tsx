@@ -38,6 +38,8 @@ export default function Tutorials() {
           }
           setRoadmapDaysByTopic(topicMap);
         }
+      } catch {
+        setTutorials([]);
       } finally {
         setLoading(false);
       }

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
+from urllib.parse import quote_plus
 
 from app.database import get_db
 from app.dependencies import get_current_user
@@ -155,6 +156,8 @@ def get_roadmap_day_details(
     elif continue_problem:
         status = "In Progress"
 
+    topic_query = quote_plus(day.topic)
+
     return RoadmapDayDetailResponse(
         id=day.id,
         day_number=day.day_number,
@@ -164,8 +167,16 @@ def get_roadmap_day_details(
         task_type=day.task_type,
         tutorial_title=day.tutorial_title,
         tutorial_link=day.tutorial_link,
+        tutorial_path=f"/tutorials?topic={topic_query}",
+        practice_path=f"/problems?topic={topic_query}",
+        external_resource_link=day.tutorial_link,
         status=status,
         continue_problem_id=continue_problem.id if continue_problem else None,
+        continue_problem_path=(
+            f"/problems/{continue_problem.id}?roadmapDay={day.day_number}&source=roadmap"
+            if continue_problem
+            else None
+        ),
         problems=[
             RoadmapDayProblemItem(
                 id=item.id,
@@ -173,6 +184,8 @@ def get_roadmap_day_details(
                 difficulty=item.difficulty,
                 topic=item.topic,
                 tutorial_link=item.tutorial_link,
+                problem_path=f"/problems/{item.id}",
+                editorial_path=f"/problems/{item.id}?tab=editorial&roadmapDay={day.day_number}&source=roadmap",
             )
             for item in problems
         ],

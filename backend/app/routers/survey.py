@@ -38,6 +38,8 @@ def submit_survey(
     survey.preferred_language = payload.preferred_language
     survey.preparation_start_date = payload.preparation_start_date
     survey.goal_timeline_months = payload.goal_timeline_months
+    survey.weak_areas = payload.weak_areas
+    survey.confidence_level = payload.confidence_level
 
     db.commit()
     db.refresh(survey)
