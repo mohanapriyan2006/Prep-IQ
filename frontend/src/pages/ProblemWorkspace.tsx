@@ -43,13 +43,27 @@ export default function ProblemWorkspace() {
   const [problem, setProblem] = useState<CodingProblem | null>(null);
   const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
   const [language, setLanguage] = useState<CodeLanguage>('cpp');
-  const [code, setCode] = useState(STARTERS.cpp);
+  const [code, setCodeState] = useState(STARTERS.cpp);
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [status, setStatus] = useState('Idle');
   const [runtime, setRuntime] = useState<string>('');
   const [memory, setMemory] = useState<string>('');
   const [running, setRunning] = useState(false);
+
+  const setCode = useCallback((nextCode: string) => {
+    setCodeState(nextCode);
+    if (problemId) {
+      localStorage.setItem(`prepiq_code_${problemId}_${language}`, nextCode);
+    }
+  }, [problemId, language]);
+
+  const resetCode = useCallback(() => {
+    setCodeState(STARTERS[language]);
+    if (problemId) {
+      localStorage.setItem(`prepiq_code_${problemId}_${language}`, STARTERS[language]);
+    }
+  }, [problemId, language]);
   const [split, setSplit] = useState(47);
   const [roadmapDayTag, setRoadmapDayTag] = useState<number | null>(null);
   const [postSubmitInsight, setPostSubmitInsight] = useState<string>('');
@@ -83,8 +97,10 @@ export default function ProblemWorkspace() {
   }, [problemId, isAuthenticated]);
 
   useEffect(() => {
-    setCode(STARTERS[language]);
-  }, [language]);
+    if (!problemId) return;
+    const saved = localStorage.getItem(`prepiq_code_${problemId}_${language}`);
+    setCodeState(saved ?? STARTERS[language]);
+  }, [language, problemId]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -392,6 +408,7 @@ export default function ProblemWorkspace() {
           onCodeChange={(nextCode) => setCode(nextCode)}
           onRun={() => void onRun()}
           onSubmit={() => void onSubmit()}
+          onReset={() => void resetCode()}
         />
       </div>
 

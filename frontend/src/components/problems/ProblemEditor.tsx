@@ -16,6 +16,7 @@ interface ProblemEditorProps {
   onCodeChange: (code: string) => void;
   onRun: () => void;
   onSubmit: () => void;
+  onReset?: () => void;
 }
 
 const languageLabel: Array<{ value: CodeLanguage; label: string }> = [
@@ -38,6 +39,7 @@ export function ProblemEditor({
   onCodeChange,
   onRun,
   onSubmit,
+  onReset,
 }: ProblemEditorProps) {
   return (
     <section className="flex h-full flex-1 flex-col">
@@ -57,6 +59,15 @@ export function ProblemEditor({
           </select>
         </div>
         <div className="flex items-center gap-2">
+          {onReset ? (
+            <button
+              onClick={onReset}
+              disabled={running}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#222A33] bg-[#151B22] px-3 py-2 text-xs font-semibold text-[#E2E8F0] disabled:opacity-60"
+            >
+              Reset
+            </button>
+          ) : null}
           <button
             onClick={onRun}
             disabled={running}

@@ -1,3 +1,5 @@
+import { runCodeWithPiston } from '../services/pistonRunner';
+
 export interface EvaluationResult {
   status: string;
   passed: number;
@@ -17,11 +19,12 @@ function normalizeOutput(out: string): string {
     .trim();
 }
 
-export function evaluateCode(
+export async function evaluateCode(
   code: string,
+  language: string,
   visible_testcases: Array<{ input: string; expected_output: string }>,
   hidden_testcases: Array<{ input: string; expected_output: string }>,
-): EvaluationResult {
+): Promise<EvaluationResult> {
   if (!code || code.trim().length === 0) {
     return {
       status: 'Runtime Error',
@@ -36,10 +39,17 @@ export function evaluateCode(
   const allTestcases = [...visible_testcases, ...hidden_testcases];
   let passed = 0;
   const outputs: string[] = [];
+  let maxRuntime = 0;
+  let combinedStderr = '';
 
   for (const tc of allTestcases) {
+    const result = await runCodeWithPiston(language, code, tc.input);
+    const actual = normalizeOutput(result.output);
     const expected = normalizeOutput(tc.expected_output);
-    const actual = expected;
+    const runtimeNum = parseFloat(result.runtime.replace('ms', '')) || 0;
+    maxRuntime = Math.max(maxRuntime, runtimeNum);
+    if (result.stderr) combinedStderr += result.stderr + '\n';
+
     if (actual === expected) {
       passed++;
     }
@@ -48,25 +58,13 @@ export function evaluateCode(
 
   const total = allTestcases.length;
   const status = passed === total ? 'Accepted' : 'Wrong Answer';
-  const max_runtime_ms = Math.floor(Math.random() * 490) + 10;
 
   return {
     status,
     passed,
     total,
-    max_runtime_ms,
+    max_runtime_ms: maxRuntime,
     output: outputs.slice(0, visible_testcases.length).join('\n---\n'),
-    stderr: '',
+    stderr: combinedStderr.trim(),
   };
-}
-
-export function executeCode(
-  code: string,
-  input: string,
-): { output: string; stderr: string; runtime: string; status: string } {
-  if (!code || code.trim().length === 0) {
-    return { output: '', stderr: 'Code is empty', runtime: '0ms', status: 'Runtime Error' };
-  }
-  const runtime = `${Math.floor(Math.random() * 490) + 10}ms`;
-  return { output: `Executed with input:\n${input}`, stderr: '', runtime, status: 'Success' };
 }

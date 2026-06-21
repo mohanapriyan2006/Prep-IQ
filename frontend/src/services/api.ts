@@ -63,7 +63,8 @@ import {
   syncExternalStats as syncExternalStatsDB,
 } from './localStorageDB';
 
-import { evaluateCode, executeCode as runExecute } from '../utils/codeEvaluator';
+import { evaluateCode } from '../utils/codeEvaluator';
+import { runCodeWithPiston } from './pistonRunner';
 import { generateCodeReview, generateEditorial, generateAIAnalysis } from '../utils/mockAI';
 
 export const TOKEN_KEY = 'prepiq_auth_token';
@@ -83,7 +84,7 @@ export const api = {
       const { getProblemById } = await import('../services/localStorageDB');
       const problem = getProblemById(d.problem_id);
       if (!problem) throw new Error('Problem not found');
-      const result = evaluateCode(d.code, problem.visible_testcases, problem.hidden_testcases);
+      const result = await evaluateCode(d.code, d.language, problem.visible_testcases, problem.hidden_testcases);
       return { data: await submitAssessmentDB({ problem_id: d.problem_id, language: d.language, code: d.code, status: result.status, passed: result.passed, total: result.total, runtime_ms: result.max_runtime_ms }) };
     }
     return { data: null };
@@ -159,7 +160,7 @@ export async function fetchProblem(problemId: number): Promise<CodingProblem> {
 }
 
 export async function executeCode(payload: ExecutePayload): Promise<ExecuteResult> {
-  return runExecute(payload.code, payload.input);
+  return runCodeWithPiston(payload.language, payload.code, payload.input);
 }
 
 export async function submitCode(payload: {
@@ -170,7 +171,7 @@ export async function submitCode(payload: {
   const { getProblemById } = await import('../services/localStorageDB');
   const problem = getProblemById(payload.problem_id);
   if (!problem) throw new Error('Problem not found');
-  const result = evaluateCode(payload.code, problem.visible_testcases, problem.hidden_testcases);
+  const result = await evaluateCode(payload.code, payload.language, problem.visible_testcases, problem.hidden_testcases);
   return createSubmission({
     problem_id: payload.problem_id,
     language: payload.language,
@@ -244,7 +245,7 @@ export async function submitAssessment(payload: {
   const { getProblemById } = await import('../services/localStorageDB');
   const problem = getProblemById(payload.problem_id);
   if (!problem) throw new Error('Problem not found');
-  const result = evaluateCode(payload.code, problem.visible_testcases, problem.hidden_testcases);
+  const result = await evaluateCode(payload.code, payload.language, problem.visible_testcases, problem.hidden_testcases);
   return submitAssessmentDB({
     problem_id: payload.problem_id,
     language: payload.language,
